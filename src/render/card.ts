@@ -23,10 +23,10 @@ const GRADE_COLORS: Record<string, string> = {
   D: "#868e96",
 };
 
-const DIMENSION_META: Record<string, { marker: string; label: string; color: string }> = {
-  brain: { marker: "[B]", label: "Brain", color: "#a78bfa" },
-  power: { marker: "[P]", label: "Power", color: "#34d399" },
-  config: { marker: "[C]", label: "Config", color: "#fbbf24" },
+const DIMENSION_META: Record<string, { label: string; color: string }> = {
+  brain: { label: "模型", color: "#a78bfa" },
+  power: { label: "能力", color: "#34d399" },
+  config: { label: "配置", color: "#fbbf24" },
 };
 
 function tryLoadCjkFont(): boolean {
@@ -89,7 +89,7 @@ export function generateCard(report: ScoreReport, outputPath: string): void {
 
   // Model name
   if (report.modelName) {
-    ctx.fillStyle = GRAY;
+    ctx.fillStyle = TEXT;
     ctx.font = `16px ${fontFamily}`;
     ctx.textAlign = "center";
     const modelLabel = hasCjk ? `当前模型: ${report.modelName}` : `Model: ${report.modelName}`;
@@ -128,7 +128,7 @@ export function generateCard(report: ScoreReport, outputPath: string): void {
 
   // Comment
   if (report.gradeInfo.comment) {
-    ctx.fillStyle = GRAY;
+    ctx.fillStyle = TEXT;
     ctx.font = `italic 14px ${fontFamily}`;
     const comment = hasCjk ? report.gradeInfo.comment : "";
     if (comment) ctx.fillText(`"${comment}"`, WIDTH / 2, 252);
@@ -149,7 +149,7 @@ export function generateCard(report: ScoreReport, outputPath: string): void {
   let barY = 290;
 
   for (const dim of report.dimensions) {
-    const meta = DIMENSION_META[dim.name] ?? { marker: "?", label: dim.name, color: GREEN };
+    const meta = DIMENSION_META[dim.name] ?? { label: dim.name, color: GREEN };
 
     // Label
     ctx.fillStyle = meta.color;
