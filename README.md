@@ -134,6 +134,10 @@ MCP 和 Skills 注册表内置在项目中。添加新条目：
 2. 在 `src/registry/mcp-registry.ts` 或 `src/registry/skills-registry.ts` 中添加 patterns
 3. 提交 PR
 
+## 社区
+
+欢迎到 [linux.do](https://linux.do) 讨论你的跑分结果、分享提分攻略、或者提交 Bug 反馈。晒出你的分数，看看谁才是真正的 AI 军神！
+
 ## License
 
 MIT

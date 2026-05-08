@@ -135,6 +135,10 @@ The MCP and Skills registries are built-in. To add new entries:
 2. Add patterns to `src/registry/mcp-registry.ts` or `src/registry/skills-registry.ts`
 3. Submit a PR
 
+## Community
+
+Share your score, discuss improvement tips, or report bugs on [linux.do](https://linux.do). Post your results and see who's the real AI God!
+
 ## License
 
 MIT
