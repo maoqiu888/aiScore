@@ -26,10 +26,9 @@ describe("getGradeInfo", () => {
 
 describe("computeReport", () => {
   const dimensions: DimensionResult[] = [
-    { name: "brain", score: 20, maxScore: 25, evidence: [] },
-    { name: "power", score: 25, maxScore: 30, evidence: [] },
-    { name: "tuning", score: 18, maxScore: 25, evidence: [] },
-    { name: "ecosystem", score: 15, maxScore: 20, evidence: [] },
+    { name: "brain", score: 25, maxScore: 30, evidence: [] },
+    { name: "power", score: 32, maxScore: 40, evidence: [] },
+    { name: "config", score: 21, maxScore: 30, evidence: [] },
   ];
 
   const categories: CategoryCoverage[] = [
@@ -41,7 +40,7 @@ describe("computeReport", () => {
   it("sums dimension scores into total", () => {
     const report = computeReport(dimensions, categories);
     expect(report.total).toBe(78);
-    expect(report.maxTotal).toBe(100);
+    expect(report.maxTotal).toBe(100);  // 30+40+30
   });
 
   it("assigns correct grade", () => {

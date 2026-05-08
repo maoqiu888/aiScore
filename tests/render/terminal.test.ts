@@ -38,20 +38,18 @@ describe("renderScoreBox", () => {
 });
 
 describe("renderDimensions", () => {
-  it("renders all four dimensions", () => {
+  it("renders all three dimensions", () => {
     const dims: DimensionResult[] = [
-      { name: "brain", score: 20, maxScore: 25, evidence: [] },
-      { name: "power", score: 25, maxScore: 30, evidence: [] },
-      { name: "tuning", score: 18, maxScore: 25, evidence: [] },
-      { name: "ecosystem", score: 15, maxScore: 20, evidence: [] },
+      { name: "brain", score: 25, maxScore: 30, evidence: [] },
+      { name: "power", score: 32, maxScore: 40, evidence: [] },
+      { name: "config", score: 20, maxScore: 30, evidence: [] },
     ];
     const output = renderDimensions(dims);
     expect(output).toContain("Brain");
     expect(output).toContain("Power");
-    expect(output).toContain("Tuning");
-    expect(output).toContain("Ecosystem");
-    expect(output).toContain("20/25");
+    expect(output).toContain("Config");
     expect(output).toContain("25/30");
+    expect(output).toContain("32/40");
   });
 });
 

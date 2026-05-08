@@ -16,7 +16,7 @@ export interface EvidenceItem {
 }
 
 export interface DimensionResult {
-  name: "brain" | "power" | "tuning" | "ecosystem";
+  name: "brain" | "power" | "config";
   score: number;
   maxScore: number;
   evidence: EvidenceItem[];

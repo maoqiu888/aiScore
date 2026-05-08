@@ -37,6 +37,6 @@ describe("scanBrain", () => {
 
   it("maxScore is always 25", () => {
     const result = scanBrain({ claudeModel: null });
-    expect(result.maxScore).toBe(25);
+    expect(result.maxScore).toBe(30);
   });
 });

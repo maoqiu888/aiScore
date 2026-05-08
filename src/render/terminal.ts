@@ -5,8 +5,7 @@ import type { DimensionResult, EvidenceItem, CategoryCoverage, Suggestion } from
 const DIMENSION_LABELS: Record<string, { icon: string; label: string }> = {
   brain: { icon: "🧠", label: "Brain" },
   power: { icon: "⚡", label: "Power" },
-  tuning: { icon: "🎯", label: "Tuning" },
-  ecosystem: { icon: "🌐", label: "Ecosystem" },
+  config: { icon: "🎯", label: "Config" },
 };
 
 export function renderBar(score: number, max: number, width: number): string {

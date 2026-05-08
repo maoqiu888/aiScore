@@ -29,7 +29,7 @@ function scoreMcp(mcpNames: string[]): { score: number; evidence: EvidenceItem; 
     if (catDef) weightSum += catDef.weight;
   }
 
-  const score = Math.min(18, weightSum);
+  const score = Math.min(24, weightSum);
   const detail = matched.length > 0
     ? `${matched.join(", ")} (${coveredCategories.size}/${MCP_CATEGORIES.length} categories)`
     : "None detected";
@@ -65,7 +65,7 @@ function scoreSkills(skillNames: string[]): { score: number; evidence: EvidenceI
     if (catDef) coveredWeight += catDef.weight;
   }
 
-  const score = Math.min(12, Math.round((coveredWeight / totalWeight) * 12));
+  const score = Math.min(16, Math.round((coveredWeight / totalWeight) * 16));
 
   const parts: string[] = [];
   if (suiteNames.length > 0) parts.push(`Suites: ${suiteNames.join(", ")}`);
@@ -84,7 +84,7 @@ export function scanPower(input: PowerInput): DimensionResult {
   return {
     name: "power",
     score,
-    maxScore: 30,
+    maxScore: 40,
     evidence: [mcp.evidence, skills.evidence],
   };
 }

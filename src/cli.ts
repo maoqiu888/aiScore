@@ -3,8 +3,7 @@ import chalk from "chalk";
 import { detectAll } from "./scanner/detect.js";
 import { scanBrain } from "./scanner/brain.js";
 import { scanPower } from "./scanner/power.js";
-import { scanTuning } from "./scanner/tuning.js";
-import { scanEcosystem } from "./scanner/ecosystem.js";
+import { scanConfig } from "./scanner/config.js";
 import { computeReport } from "./scorer/engine.js";
 import { renderFullReport } from "./render/terminal.js";
 import { generateCard } from "./render/card.js";
@@ -71,9 +70,8 @@ export function run(): void {
       const detected = detectAll();
       const brainResult = scanBrain(detected.brain);
       const powerResult = scanPower(detected.power);
-      const tuningResult = scanTuning(detected.tuning);
-      const ecoResult = scanEcosystem(detected.ecosystem);
-      const dimensions = [brainResult, powerResult, tuningResult, ecoResult];
+      const configResult = scanConfig(detected.config);
+      const dimensions = [brainResult, powerResult, configResult];
       const categories = buildCategories(detected.power.mcpNames, detected.power.skillNames);
       const report = computeReport(dimensions, categories);
 

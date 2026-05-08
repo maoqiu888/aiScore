@@ -14,8 +14,7 @@ const BAR_BG = "#1e293b";
 const DIMENSION_LABELS: Record<string, { icon: string; label: string }> = {
   brain: { icon: "🧠", label: "Brain" },
   power: { icon: "⚡", label: "Power" },
-  tuning: { icon: "🎯", label: "Tuning" },
-  ecosystem: { icon: "🌐", label: "Ecosystem" },
+  config: { icon: "🎯", label: "Config" },
 };
 
 function drawRoundedRect(

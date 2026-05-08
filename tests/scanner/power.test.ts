@@ -7,7 +7,7 @@ describe("scanPower", () => {
       mcpNames: ["mysql", "postgres", "sqlite"],
       skillNames: [],
     });
-    expect(result.score).toBeLessThanOrEqual(18);
+    expect(result.score).toBeLessThanOrEqual(24);
   });
 
   it("scores higher for diverse MCP categories", () => {
@@ -34,7 +34,7 @@ describe("scanPower", () => {
 
   it("maxScore is always 30", () => {
     const result = scanPower({ mcpNames: [], skillNames: [] });
-    expect(result.maxScore).toBe(30);
+    expect(result.maxScore).toBe(40);
   });
 
   it("scores 0 when nothing is installed", () => {

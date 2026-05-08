@@ -32,7 +32,7 @@ const ELO_MIN = 1150;
 
 function eloToScore(elo: number): number {
   const clamped = Math.max(ELO_MIN, Math.min(ELO_MAX, elo));
-  return Math.round(((clamped - ELO_MIN) / (ELO_MAX - ELO_MIN)) * 25);
+  return Math.round(((clamped - ELO_MIN) / (ELO_MAX - ELO_MIN)) * 30);
 }
 
 function matchModel(modelStr: string): { elo: number; name: string } | null {
@@ -50,7 +50,7 @@ export function scanBrain(input: BrainInput): DimensionResult {
 
   if (!input.claudeModel) {
     evidence.push({ label: "Model", status: "missing", detail: "No model detected" });
-    return { name: "brain", score: 0, maxScore: 25, evidence };
+    return { name: "brain", score: 0, maxScore: 30, evidence };
   }
 
   const matched = matchModel(input.claudeModel);
@@ -61,7 +61,7 @@ export function scanBrain(input: BrainInput): DimensionResult {
       status: "found",
       detail: `${matched.name} (ELO ${matched.elo}) — ${score}/25`,
     });
-    return { name: "brain", score, maxScore: 25, evidence };
+    return { name: "brain", score, maxScore: 30, evidence };
   }
 
   // Unknown model — give baseline score
@@ -70,5 +70,5 @@ export function scanBrain(input: BrainInput): DimensionResult {
     status: "found",
     detail: `${input.claudeModel} (unranked)`,
   });
-  return { name: "brain", score: 10, maxScore: 25, evidence };
+  return { name: "brain", score: 10, maxScore: 30, evidence };
 }

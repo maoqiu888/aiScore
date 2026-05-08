@@ -2,11 +2,9 @@ import { execSync } from "node:child_process";
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { homedir, platform } from "node:os";
-import type { InstructionFile, SettingsLevel } from "./tuning.js";
 import type { BrainInput } from "./brain.js";
 import type { PowerInput } from "./power.js";
-import type { TuningInput } from "./tuning.js";
-import type { EcosystemInput, ToolConfig } from "./ecosystem.js";
+import type { InstructionFile, ToolConfig, ConfigInput } from "./config.js";
 
 export function parseOllamaList(output: string): string[] {
   const lines = output.trim().split("\n");
@@ -212,18 +210,17 @@ function detectInstructionFiles(): InstructionFile[] {
   return files;
 }
 
-function detectHooksAndSettings(): { hasHooks: boolean; settingsLevel: SettingsLevel } {
+function detectHooksAndSettings(): { hasHooks: boolean; settingsCustomized: boolean } {
   const home = homedir();
   const settings = tryReadJson(join(home, ".claude", "settings.json")) as Record<string, unknown> | null;
-  if (!settings) return { hasHooks: false, settingsLevel: "default" };
+  if (!settings) return { hasHooks: false, settingsCustomized: false };
   const hasHooks = !!settings.hooks && typeof settings.hooks === "object" && Object.keys(settings.hooks as object).length > 0;
   const hasPermissions = !!settings.permissions;
   const hasEnv = !!settings.env;
   const hasModel = !!settings.model;
-  let settingsLevel: SettingsLevel = "default";
-  if (hasPermissions && (hasEnv || hasModel)) settingsLevel = "rich";
-  else if (hasPermissions || hasEnv || hasModel) settingsLevel = "basic";
-  return { hasHooks, settingsLevel };
+  const hasPlugins = !!settings.enabledPlugins;
+  const settingsCustomized = hasPermissions || hasEnv || hasModel || hasPlugins;
+  return { hasHooks, settingsCustomized };
 }
 
 function detectInstalledTools(): string[] {
@@ -266,12 +263,11 @@ function detectToolConfigs(): ToolConfig[] {
 export interface FullDetection {
   brain: BrainInput;
   power: PowerInput;
-  tuning: TuningInput;
-  ecosystem: EcosystemInput;
+  config: ConfigInput;
 }
 
 export function detectAll(): FullDetection {
-  const { hasHooks, settingsLevel } = detectHooksAndSettings();
+  const { hasHooks, settingsCustomized } = detectHooksAndSettings();
   return {
     brain: {
       claudeModel: detectClaudeModel(),
@@ -280,13 +276,10 @@ export function detectAll(): FullDetection {
       mcpNames: detectMcpNames(),
       skillNames: detectSkillNames(),
     },
-    tuning: {
+    config: {
       instructionFiles: detectInstructionFiles(),
       hasHooks,
-      settingsLevel,
-    },
-    ecosystem: {
-      installedTools: detectInstalledTools(),
+      settingsCustomized,
       toolConfigs: detectToolConfigs(),
     },
   };
