@@ -1,8 +1,10 @@
+[English](./README.en.md) | **中文**
+
 # ai-score
 
-**Your AI toolchain, benchmarked.** One command to scan your entire AI setup and get a score out of 100.
+**给你的 AI 工具链跑个分。** 一行命令，扫描你的整个 AI 装备，满分 100。
 
-Like [PC benchmarks](https://en.wikipedia.org/wiki/Benchmark_(computing)) for your hardware — but for your AI coding tools.
+就像鲁大师给硬件跑分一样 —— 但这次跑的是你的 AI。
 
 ```bash
 npx ai-score
@@ -12,7 +14,7 @@ npx ai-score
 ╔═══════════════════════════╗
 ║                           ║
 ║   ⚡ AI SCORE: 76 / 100   ║
-║     Grade: A — AI Pro     ║
+║     等级: A — AI 高玩     ║
 ║                           ║
 ╚═══════════════════════════╝
 
@@ -21,16 +23,16 @@ npx ai-score
   🎯 Config       ███████░░░░░░░░░░░  12/30
 ```
 
-## What it scores
+## 它评什么
 
-ai-score scans your local environment and evaluates three dimensions:
+ai-score 扫描你的本地环境，从三个维度给你的 AI 打分：
 
-### 🧠 Brain (30 pts) — How strong is your model?
+### 🧠 Brain（30 分）— 你的模型有多强？
 
-Scores your AI model based on [LMSYS Chatbot Arena](https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard) ELO rankings — the most authoritative community-driven AI benchmark.
+基于 [LMSYS Chatbot Arena](https://huggingface.co/spaces/lmsys/chatbot-arena-leaderboard) ELO 排名打分 —— 最权威的社区盲测排行榜。
 
-| Model | ELO | Score |
-|-------|-----|-------|
+| 模型 | ELO | 得分 |
+|------|-----|------|
 | Claude Opus 4.7 | ~1410 | 30/30 |
 | Claude Opus 4.6 | ~1390 | 27/30 |
 | GPT-4o | ~1370 | 24/30 |
@@ -38,100 +40,99 @@ Scores your AI model based on [LMSYS Chatbot Arena](https://huggingface.co/space
 | DeepSeek V3 | ~1350 | 22/30 |
 | Claude Haiku 4.5 | ~1280 | 14/30 |
 
-### ⚡ Power (40 pts) — What can your AI actually do?
+### ⚡ Power（40 分）— 你的 AI 能做多少事？
 
-Scans your **MCP servers** and **Skills/Plugins** to measure capability coverage across 15 domains:
+扫描你的 **MCP 服务器** 和 **Skills 插件**，评估 15 个能力域的覆盖情况：
 
-**MCP Domains (9):**
-Database, Browser, Monitoring, Search, Code Repos, Filesystem, Collaboration, Automation, Specialized
+**MCP 能力域（9 个）：**
+数据库、浏览器、监控运维、搜索联网、代码仓库、文件系统、通讯协作、自动化、专业领域
 
-**Skill Domains (6):**
-Coding Standards, Engineering Workflow, API/Integration, Frontend Design, Documentation, Creative
+**Skills 能力域（6 个）：**
+编码规范、工程流程、API/集成、前端设计、文档输出、创意生成
 
-It's not about quantity — installing 5 database MCPs scores the same as 1. **Breadth of coverage** is what matters.
+不看数量看覆盖面 —— 装 5 个数据库 MCP 和装 1 个得分一样。**广度才是王道。**
 
-### 🎯 Config (30 pts) — Have you maxed out your setup?
+### 🎯 Config（30 分）— 你把 AI 用到极限了吗？
 
-Detects how well you've configured your AI tools:
+检测你对 AI 工具的调教程度：
 
-- **Instruction files** — CLAUDE.md, .cursorrules, AGENTS.md, GEMINI.md, etc.
-- **Hooks** — Automated workflows that extend your AI
-- **Settings** — Custom permissions, environment, model selection
-- **Tool configs** — How many of your AI tools have dedicated config files
+- **指令文件** — CLAUDE.md、.cursorrules、AGENTS.md、GEMINI.md 等
+- **Hooks** — 自动化工作流
+- **Settings** — 自定义权限、环境变量、模型选择
+- **工具配置** — 你的 AI 工具有多少配了专属规则文件
 
-## Grade system
+## 等级系统
 
-| Score | Grade | Title |
-|-------|-------|-------|
-| 90-100 | SSS | AI God |
-| 80-89 | S | AI Fully Armed |
-| 70-79 | A | AI Pro |
-| 60-69 | B | AI Skilled |
-| 40-59 | C | AI Beginner |
-| 0-39 | D | AI Naked |
+| 分数 | 等级 | 称号 |
+|------|------|------|
+| 90-100 | SSS | AI 军神 |
+| 80-89 | S | AI 武装到牙齿 |
+| 70-79 | A | AI 高玩 |
+| 60-69 | B | AI 熟练工 |
+| 40-59 | C | AI 入门选手 |
+| 0-39 | D | AI 裸奔中 |
 
-## What it detects
+## 检测范围
 
-ai-score automatically scans:
+ai-score 自动扫描：
 
-- `~/.claude/` — Claude Code settings, plugins, skills, MCP configs
-- `~/.cursor/` — Cursor configuration
-- `.mcp.json` — Project and plugin-level MCP servers
-- `CLAUDE.md` / `.cursorrules` / `AGENTS.md` — Instruction files
-- `~/.claude/plugins/` — All installed plugin MCP servers
-- Installed AI tools (Claude Code, Cursor, Copilot, Windsurf, Cline, Aider, Continue)
-- AI model from your active configuration
+- `~/.claude/` — Claude Code 设置、插件、Skills、MCP 配置
+- `~/.cursor/` — Cursor 配置
+- `.mcp.json` — 项目级和插件级 MCP 服务器
+- `CLAUDE.md` / `.cursorrules` / `AGENTS.md` — 指令文件
+- `~/.claude/plugins/` — 所有已安装插件的 MCP
+- 已安装的 AI 工具（Claude Code、Cursor、Copilot、Windsurf、Cline、Aider、Continue）
+- 当前使用的 AI 模型
 
-## Privacy
+## 隐私
 
-- **No API keys are read or transmitted.** Period.
-- Config files are analyzed locally for structure only (line counts, headings)
-- No file contents are ever uploaded
-- `--offline` flag for fully local execution
-- `--json` for machine-readable output
+- **不读取、不传输任何 API Key。** 没有例外。
+- 配置文件仅在本地分析结构（行数、标题），不上传内容
+- `--offline` 完全离线运行
+- `--json` 输出机器可读格式
 
-## Shareable score card
+## 可分享的评分卡片
 
-ai-score generates a PNG image you can share on social media:
+ai-score 自动生成一张 PNG 图片，方便你发到社交媒体：
 
 ```bash
 npx ai-score
-# => 📸 ai-score-card.png saved
+# => 📸 ai-score-card.png 已保存
 ```
 
-## CLI options
+## 命令行参数
 
 ```bash
-npx ai-score              # Full benchmark
-npx ai-score --json       # JSON output
-npx ai-score --no-card    # Skip PNG generation
-npx ai-score --offline    # Fully offline mode
+npx ai-score              # 完整跑分
+npx ai-score --json       # JSON 输出
+npx ai-score --no-card    # 不生成 PNG 卡片
+npx ai-score --offline    # 完全离线模式
 ```
 
-## How to improve your score
+## 怎么提分
 
-ai-score tells you exactly what to do:
+ai-score 会告诉你该做什么：
 
 ```
-💡 Suggestions:
-   1. +5 pts → Add database MCP (mysql, postgres, sqlite)
-   2. +5 pts → Add monitoring MCP (sentry, datadog)
-   3. +3 pts → Add filesystem MCP (filesystem, google-drive)
+💡 提升建议:
+   1. +5 分 → 安装数据库 MCP（mysql、postgres、sqlite）
+   2. +5 分 → 安装监控 MCP（sentry、datadog）
+   3. +3 分 → 安装文件系统 MCP（filesystem、google-drive）
 ```
 
-**Quick wins:**
-- Install [superpowers](https://github.com/anthropics/claude-code-plugins) skills → covers 6/6 skill domains instantly
-- Add a `CLAUDE.md` with project rules → +2-6 config points
-- Configure hooks in settings.json → +5 config points
-- Add MCP servers for your most-used services → +3-5 power points each
+**快速提分攻略：**
+- 安装 [superpowers](https://github.com/anthropics/claude-code-plugins) 插件 → 一键覆盖 6/6 Skills 能力域
+- 写一个 `CLAUDE.md` 项目规范 → Config +2~6 分
+- 配置 hooks 自动化 → Config +5 分
+- 给常用服务装 MCP → Power 每个 +3~5 分
 
-## Contributing
+## 贡献
 
-The MCP and Skills registries are built-in. To add new entries:
+MCP 和 Skills 注册表内置在项目中。添加新条目：
 
-1. Fork this repo
-2. Add patterns to `src/registry/mcp-registry.ts` or `src/registry/skills-registry.ts`
-3. Submit a PR
+1. Fork 本仓库
+2. 在 `src/registry/mcp-registry.ts` 或 `src/registry/skills-registry.ts` 中添加 patterns
+3. 提交 PR
 
 ## License
 
