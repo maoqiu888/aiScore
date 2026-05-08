@@ -34,6 +34,7 @@ export type Grade = "SSS" | "S" | "A" | "B" | "C" | "D";
 export interface GradeInfo {
   grade: Grade;
   title: string;
+  comment?: string;
 }
 
 export interface Suggestion {
@@ -48,4 +49,6 @@ export interface ScoreReport {
   dimensions: DimensionResult[];
   categories: CategoryCoverage[];
   suggestions: Suggestion[];
+  beatPercent?: number;
+  modelName?: string;
 }

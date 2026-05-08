@@ -73,21 +73,16 @@ export function run(): void {
       const configResult = scanConfig(detected.config);
       const dimensions = [brainResult, powerResult, configResult];
       const categories = buildCategories(detected.power.mcpNames, detected.power.skillNames);
-      const report = computeReport(dimensions, categories);
+      const brainEvidence = brainResult.evidence.find((e) => e.label === "Model");
+      const modelName = brainEvidence?.detail?.split("(")[0]?.trim() ?? undefined;
+      const report = computeReport(dimensions, categories, modelName);
 
       if (opts.json) {
         console.log(JSON.stringify(report, null, 2));
         return;
       }
 
-      const output = renderFullReport(
-        report.total,
-        report.gradeInfo.grade,
-        report.gradeInfo.title,
-        report.dimensions,
-        report.categories,
-        report.suggestions,
-      );
+      const output = renderFullReport(report);
       console.log(output);
 
       if (opts.card !== false) {

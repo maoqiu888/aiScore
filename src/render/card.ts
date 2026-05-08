@@ -5,7 +5,7 @@ import { homedir, platform } from "node:os";
 import type { ScoreReport } from "../types.js";
 
 const WIDTH = 800;
-const HEIGHT = 520;
+const HEIGHT = 580;
 const BG = "#0f172a";
 const TEXT = "#e2e8f0";
 const ACCENT = "#38bdf8";
@@ -87,41 +87,66 @@ export function generateCard(report: ScoreReport, outputPath: string): void {
   ctx.fillStyle = BG;
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
+  // Model name
+  if (report.modelName) {
+    ctx.fillStyle = GRAY;
+    ctx.font = `16px ${fontFamily}`;
+    ctx.textAlign = "center";
+    const modelLabel = hasCjk ? `当前模型: ${report.modelName}` : `Model: ${report.modelName}`;
+    ctx.fillText(modelLabel, WIDTH / 2, 35);
+  }
+
   // Title
   ctx.fillStyle = ACCENT;
   ctx.font = `bold 22px ${fontFamily}`;
   ctx.textAlign = "center";
-  ctx.fillText("AI SCORE", WIDTH / 2, 50);
+  ctx.fillText("AI SCORE", WIDTH / 2, 65);
 
   // Big score
   ctx.fillStyle = TEXT;
   ctx.font = `bold 80px ${fontFamily}`;
-  ctx.fillText(`${report.total}`, WIDTH / 2 - 30, 145);
+  ctx.fillText(`${report.total}`, WIDTH / 2 - 30, 155);
 
   ctx.font = `28px ${fontFamily}`;
   ctx.fillStyle = GRAY;
-  ctx.fillText("/ 100", WIDTH / 2 + 55, 145);
+  ctx.fillText("/ 100", WIDTH / 2 + 55, 155);
 
   // Grade badge
   const gradeColor = GRADE_COLORS[report.gradeInfo.grade] ?? ACCENT;
   ctx.fillStyle = gradeColor;
   ctx.font = `bold 32px ${fontFamily}`;
   const title = hasCjk ? report.gradeInfo.title : (GRADE_TITLES_EN[report.gradeInfo.title] ?? report.gradeInfo.title);
-  ctx.fillText(`${report.gradeInfo.grade}  ${title}`, WIDTH / 2, 195);
+  ctx.fillText(`${report.gradeInfo.grade}  ${title}`, WIDTH / 2, 200);
+
+  // Beat percent
+  if (report.beatPercent) {
+    ctx.fillStyle = YELLOW;
+    ctx.font = `bold 16px ${fontFamily}`;
+    const beatLabel = hasCjk ? `击败了 ${report.beatPercent}% 的用户` : `Beat ${report.beatPercent}% of users`;
+    ctx.fillText(beatLabel, WIDTH / 2, 228);
+  }
+
+  // Comment
+  if (report.gradeInfo.comment) {
+    ctx.fillStyle = GRAY;
+    ctx.font = `italic 14px ${fontFamily}`;
+    const comment = hasCjk ? report.gradeInfo.comment : "";
+    if (comment) ctx.fillText(`"${comment}"`, WIDTH / 2, 252);
+  }
 
   // Separator line
   ctx.strokeStyle = "#1e293b";
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(100, 220);
-  ctx.lineTo(700, 220);
+  ctx.moveTo(100, 268);
+  ctx.lineTo(700, 268);
   ctx.stroke();
 
   // Dimension bars
   const barX = 100;
   const barWidth = 420;
   const barHeight = 28;
-  let barY = 245;
+  let barY = 290;
 
   for (const dim of report.dimensions) {
     const meta = DIMENSION_META[dim.name] ?? { marker: "?", label: dim.name, color: GREEN };

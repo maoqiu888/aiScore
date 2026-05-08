@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import boxen from "boxen";
-import type { DimensionResult, EvidenceItem, CategoryCoverage, Suggestion } from "../types.js";
+import type { DimensionResult, CategoryCoverage, Suggestion, ScoreReport } from "../types.js";
 
 const DIMENSION_LABELS: Record<string, { icon: string; label: string }> = {
   brain: { icon: "🧠", label: "Brain" },
@@ -14,11 +14,20 @@ export function renderBar(score: number, max: number, width: number): string {
   return chalk.green("█".repeat(filled)) + chalk.gray("░".repeat(empty));
 }
 
-export function renderScoreBox(total: number, grade: string, title: string): string {
-  const lines = [
-    `⚡ AI SCORE: ${total} / 100`,
-    `等级: ${grade} — ${title}`,
-  ];
+export function renderScoreBox(total: number, grade: string, title: string, modelName?: string, beatPercent?: number, comment?: string): string {
+  const lines: string[] = [];
+  if (modelName) {
+    lines.push(`当前模型: ${modelName}`);
+  }
+  lines.push(`⚡ AI SCORE: ${total} / 100`);
+  lines.push(`等级: ${grade} — ${title}`);
+  if (beatPercent) {
+    lines.push(`🏆 击败了 ${beatPercent}% 的用户`);
+  }
+  if (comment) {
+    lines.push("");
+    lines.push(`"${comment}"`);
+  }
   const content = lines.map((l) => chalk.bold.white(l)).join("\n");
   return boxen(content, {
     padding: 1,
@@ -84,24 +93,23 @@ export function renderSuggestions(suggestions: Suggestion[]): string {
   return lines.join("\n");
 }
 
-export function renderFullReport(
-  total: number,
-  grade: string,
-  title: string,
-  dimensions: DimensionResult[],
-  categories: CategoryCoverage[],
-  suggestions: Suggestion[],
-  cardPath?: string,
-): string {
+export function renderFullReport(report: ScoreReport, cardPath?: string): string {
   const parts: string[] = [
-    renderScoreBox(total, grade, title),
+    renderScoreBox(
+      report.total,
+      report.gradeInfo.grade,
+      report.gradeInfo.title,
+      report.modelName,
+      report.beatPercent,
+      report.gradeInfo.comment,
+    ),
     "",
-    renderDimensions(dimensions),
+    renderDimensions(report.dimensions),
     "",
-    renderEvidence(dimensions),
+    renderEvidence(report.dimensions),
     "",
-    renderCategories(categories),
-    renderSuggestions(suggestions),
+    renderCategories(report.categories),
+    renderSuggestions(report.suggestions),
   ];
   if (cardPath) {
     parts.push("");
