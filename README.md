@@ -7,7 +7,12 @@
 就像鲁大师给硬件跑分一样 —— 但这次跑的是你的 AI。
 
 ```bash
+# 直接运行（首次会提示确认安装）
 npx ai-score
+
+# 或者全局安装，以后直接跑
+npm install -g ai-score
+ai-score
 ```
 
 ```

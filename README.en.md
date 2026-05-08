@@ -7,7 +7,12 @@
 Like [PC benchmarks](https://en.wikipedia.org/wiki/Benchmark_(computing)) for your hardware — but for your AI coding tools.
 
 ```bash
+# Run directly (will prompt to install on first run)
 npx ai-score
+
+# Or install globally for instant access
+npm install -g ai-score
+ai-score
 ```
 
 ```
