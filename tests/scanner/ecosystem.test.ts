@@ -4,8 +4,8 @@ import { scanEcosystem } from "../../src/scanner/ecosystem.js";
 describe("scanEcosystem", () => {
   it("scores 3 per installed tool, max 12", () => {
     const result = scanEcosystem({
-      installedTools: ["claude", "cursor", "copilot"],
-      apiKeyNames: [],
+      installedTools: ["Claude Code", "Cursor", "Copilot"],
+      toolConfigs: [],
     });
     const toolEvidence = result.evidence.find((e) => e.label === "AI Tools");
     expect(toolEvidence?.status).toBe("found");
@@ -14,30 +14,45 @@ describe("scanEcosystem", () => {
 
   it("caps tool score at 12", () => {
     const result = scanEcosystem({
-      installedTools: ["claude", "cursor", "copilot", "windsurf", "cline"],
-      apiKeyNames: [],
+      installedTools: ["Claude Code", "Cursor", "Copilot", "Windsurf", "Cline"],
+      toolConfigs: [],
     });
-    // 5 tools × 3 = 15, but cap at 12
     expect(result.score).toBeLessThanOrEqual(12);
   });
 
-  it("scores 2 per API key, max 8", () => {
+  it("scores 2 per configured tool, max 8", () => {
     const result = scanEcosystem({
       installedTools: [],
-      apiKeyNames: ["ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GOOGLE_API_KEY", "DEEPSEEK_API_KEY"],
+      toolConfigs: [
+        { tool: "Claude Code", hasConfig: true },
+        { tool: "Cursor", hasConfig: true },
+        { tool: "Copilot", hasConfig: true },
+        { tool: "Windsurf", hasConfig: true },
+      ],
     });
-    const keyEvidence = result.evidence.find((e) => e.label === "API Keys");
-    expect(keyEvidence?.status).toBe("found");
+    const configEvidence = result.evidence.find((e) => e.label === "Tool Configs");
+    expect(configEvidence?.status).toBe("found");
     expect(result.score).toBe(8);
   });
 
+  it("does not count unconfigured tools", () => {
+    const result = scanEcosystem({
+      installedTools: [],
+      toolConfigs: [
+        { tool: "Claude Code", hasConfig: true },
+        { tool: "Cursor", hasConfig: false },
+      ],
+    });
+    expect(result.score).toBe(2);
+  });
+
   it("maxScore is always 20", () => {
-    const result = scanEcosystem({ installedTools: [], apiKeyNames: [] });
+    const result = scanEcosystem({ installedTools: [], toolConfigs: [] });
     expect(result.maxScore).toBe(20);
   });
 
   it("scores 0 for empty ecosystem", () => {
-    const result = scanEcosystem({ installedTools: [], apiKeyNames: [] });
+    const result = scanEcosystem({ installedTools: [], toolConfigs: [] });
     expect(result.score).toBe(0);
   });
 });

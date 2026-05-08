@@ -6,7 +6,7 @@ import type { InstructionFile, SettingsLevel } from "./tuning.js";
 import type { BrainInput } from "./brain.js";
 import type { PowerInput } from "./power.js";
 import type { TuningInput } from "./tuning.js";
-import type { EcosystemInput } from "./ecosystem.js";
+import type { EcosystemInput, ToolConfig } from "./ecosystem.js";
 
 export function parseOllamaList(output: string): string[] {
   const lines = output.trim().split("\n");
@@ -60,25 +60,6 @@ function detectClaudeModel(): string | null {
   return null;
 }
 
-function detectEnvKeys(): Record<string, boolean> {
-  const keys = [
-    "ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GOOGLE_API_KEY",
-    "GOOGLE_GENERATIVE_AI_API_KEY", "DEEPSEEK_API_KEY",
-    "MISTRAL_API_KEY", "COHERE_API_KEY",
-  ];
-  const result: Record<string, boolean> = {};
-  for (const key of keys) {
-    if (process.env[key]) result[key] = true;
-  }
-  return result;
-}
-
-function detectOllamaModels(): string[] | null {
-  if (!commandExists("ollama")) return null;
-  const output = tryExec("ollama list");
-  if (output === null) return [];
-  return parseOllamaList(output);
-}
 
 function extractMcpFromSettings(settingsObj: unknown): string[] {
   if (!settingsObj || typeof settingsObj !== "object") return [];
@@ -157,26 +138,36 @@ function detectSkillNames(): string[] {
 
 function detectInstructionFiles(): InstructionFile[] {
   const files: InstructionFile[] = [];
-  const candidates = [
-    "CLAUDE.md",
-    ".cursorrules",
-    ".github/copilot-instructions.md",
-    ".windsurfrules",
-  ];
   const home = homedir();
-  const globalClaude = join(home, ".claude", "CLAUDE.md");
-  if (existsSync(globalClaude)) {
-    const content = readFileSync(globalClaude, "utf-8");
-    const lines = content.split("\n").length;
-    const hasHeadings = /^#{1,3}\s/m.test(content);
-    files.push({ name: "~/.claude/CLAUDE.md", lines, hasHeadings });
-  }
-  for (const candidate of candidates) {
-    if (existsSync(candidate)) {
-      const content = readFileSync(candidate, "utf-8");
-      const lines = content.split("\n").length;
-      const hasHeadings = /^#{1,3}\s/m.test(content);
-      files.push({ name: candidate, lines, hasHeadings });
+
+  // Global instruction files
+  const globalPaths: { name: string; path: string }[] = [
+    { name: "~/.claude/CLAUDE.md", path: join(home, ".claude", "CLAUDE.md") },
+  ];
+
+  // Project-level instruction files
+  const projectPaths: { name: string; path: string }[] = [
+    { name: "CLAUDE.md", path: "CLAUDE.md" },
+    { name: ".cursorrules", path: ".cursorrules" },
+    { name: ".github/copilot-instructions.md", path: ".github/copilot-instructions.md" },
+    { name: ".windsurfrules", path: ".windsurfrules" },
+    { name: ".clinerules", path: ".clinerules" },
+    { name: "AGENTS.md", path: "AGENTS.md" },
+    { name: "GEMINI.md", path: "GEMINI.md" },
+    { name: "CODEX.md", path: "CODEX.md" },
+    { name: ".aide/rules", path: ".aide/rules" },
+  ];
+
+  for (const entry of [...globalPaths, ...projectPaths]) {
+    try {
+      if (existsSync(entry.path)) {
+        const content = readFileSync(entry.path, "utf-8");
+        const lines = content.split("\n").length;
+        const hasHeadings = /^#{1,3}\s/m.test(content);
+        files.push({ name: entry.name, lines, hasHeadings });
+      }
+    } catch {
+      // skip unreadable files
     }
   }
   return files;
@@ -197,28 +188,40 @@ function detectHooksAndSettings(): { hasHooks: boolean; settingsLevel: SettingsL
 }
 
 function detectInstalledTools(): string[] {
-  const tools: { name: string; commands: string[] }[] = [
-    { name: "Claude Code", commands: ["claude"] },
-    { name: "Cursor", commands: ["cursor"] },
-    { name: "GitHub Copilot", commands: ["copilot"] },
-    { name: "Windsurf", commands: ["windsurf"] },
-    { name: "Cline", commands: ["cline"] },
-    { name: "Aider", commands: ["aider"] },
-    { name: "Continue", commands: ["continue"] },
+  const home = homedir();
+  const tools: { name: string; commands: string[]; configDirs: string[] }[] = [
+    { name: "Claude Code", commands: ["claude"], configDirs: [join(home, ".claude")] },
+    { name: "Cursor", commands: ["cursor"], configDirs: [join(home, ".cursor"), ".cursor"] },
+    { name: "GitHub Copilot", commands: ["copilot"], configDirs: [".github"] },
+    { name: "Windsurf", commands: ["windsurf"], configDirs: [join(home, ".windsurf"), ".windsurf"] },
+    { name: "Cline", commands: ["cline"], configDirs: [join(home, ".cline"), ".cline"] },
+    { name: "Aider", commands: ["aider"], configDirs: [join(home, ".aider")] },
+    { name: "Continue", commands: ["continue"], configDirs: [join(home, ".continue"), ".continue"] },
   ];
   const found: string[] = [];
   for (const tool of tools) {
-    if (tool.commands.some(commandExists)) found.push(tool.name);
+    const cmdFound = tool.commands.some(commandExists);
+    const dirFound = tool.configDirs.some((d) => existsSync(d));
+    if (cmdFound || dirFound) found.push(tool.name);
   }
   return found;
 }
 
-function detectApiKeyNames(): string[] {
-  const keys = [
-    "ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GOOGLE_API_KEY",
-    "DEEPSEEK_API_KEY", "MISTRAL_API_KEY", "COHERE_API_KEY",
+function detectToolConfigs(): ToolConfig[] {
+  const home = homedir();
+  const configs: { tool: string; paths: string[] }[] = [
+    { tool: "Claude Code", paths: [join(home, ".claude", "settings.json"), ".claude/settings.json", "CLAUDE.md"] },
+    { tool: "Cursor", paths: [".cursorrules", ".cursor/rules"] },
+    { tool: "GitHub Copilot", paths: [".github/copilot-instructions.md"] },
+    { tool: "Windsurf", paths: [".windsurfrules"] },
+    { tool: "Cline", paths: [".clinerules"] },
+    { tool: "Aider", paths: [".aider.conf.yml", join(home, ".aider.conf.yml")] },
+    { tool: "Continue", paths: [".continue/config.json", join(home, ".continue", "config.json")] },
   ];
-  return keys.filter((k) => !!process.env[k]);
+  return configs.map((c) => ({
+    tool: c.tool,
+    hasConfig: c.paths.some((p) => existsSync(p)),
+  }));
 }
 
 export interface FullDetection {
@@ -233,8 +236,6 @@ export function detectAll(): FullDetection {
   return {
     brain: {
       claudeModel: detectClaudeModel(),
-      envKeys: detectEnvKeys(),
-      ollamaModels: detectOllamaModels(),
     },
     power: {
       mcpNames: detectMcpNames(),
@@ -247,7 +248,7 @@ export function detectAll(): FullDetection {
     },
     ecosystem: {
       installedTools: detectInstalledTools(),
-      apiKeyNames: detectApiKeyNames(),
+      toolConfigs: detectToolConfigs(),
     },
   };
 }

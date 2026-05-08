@@ -1,74 +1,42 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { scanBrain } from "../../src/scanner/brain.js";
 
 describe("scanBrain", () => {
-  beforeEach(() => {
-    vi.unstubAllEnvs();
+  it("scores high for opus model based on ELO", () => {
+    const result = scanBrain({ claudeModel: "claude-opus-4-6" });
+    expect(result.score).toBeGreaterThanOrEqual(20);
+    const ev = result.evidence.find((e) => e.label === "Model");
+    expect(ev?.status).toBe("found");
+    expect(ev?.detail).toContain("Opus");
+    expect(ev?.detail).toContain("ELO");
   });
 
-  it("scores 10 for model tier when claude settings has opus", () => {
-    const result = scanBrain({
-      claudeModel: "claude-opus-4-6",
-      envKeys: {},
-      ollamaModels: null,
-    });
-    const modelEvidence = result.evidence.find((e) => e.label === "Model Tier");
-    expect(modelEvidence?.status).toBe("found");
-    expect(result.score).toBeGreaterThanOrEqual(10);
+  it("scores lower for sonnet than opus", () => {
+    const opus = scanBrain({ claudeModel: "claude-opus-4-6" });
+    const sonnet = scanBrain({ claudeModel: "claude-sonnet-4-6" });
+    expect(opus.score).toBeGreaterThan(sonnet.score);
   });
 
-  it("scores 7 for model tier when sonnet detected", () => {
-    const result = scanBrain({
-      claudeModel: "claude-sonnet-4-6",
-      envKeys: {},
-      ollamaModels: null,
-    });
-    expect(result.score).toBeGreaterThanOrEqual(7);
+  it("scores lower for haiku than sonnet", () => {
+    const sonnet = scanBrain({ claudeModel: "claude-sonnet-4-6" });
+    const haiku = scanBrain({ claudeModel: "claude-haiku-4.5-20251001" });
+    expect(sonnet.score).toBeGreaterThan(haiku.score);
   });
 
-  it("scores multi-provider coverage for 3 API keys", () => {
-    const result = scanBrain({
-      claudeModel: null,
-      envKeys: {
-        ANTHROPIC_API_KEY: true,
-        OPENAI_API_KEY: true,
-        GOOGLE_API_KEY: true,
-      },
-      ollamaModels: null,
-    });
-    const providerEvidence = result.evidence.find((e) => e.label === "Multi-Provider");
-    expect(providerEvidence?.status).toBe("found");
-    expect(result.score).toBeGreaterThanOrEqual(8);
+  it("scores 0 for no model detected", () => {
+    const result = scanBrain({ claudeModel: null });
+    expect(result.score).toBe(0);
+    expect(result.evidence[0].status).toBe("missing");
   });
 
-  it("scores 7 for ollama with pulled models", () => {
-    const result = scanBrain({
-      claudeModel: null,
-      envKeys: {},
-      ollamaModels: ["llama3", "codellama"],
-    });
-    const localEvidence = result.evidence.find((e) => e.label === "Local Models");
-    expect(localEvidence?.status).toBe("found");
-    expect(localEvidence?.detail).toContain("llama3");
-  });
-
-  it("scores 3 for ollama installed but no models", () => {
-    const result = scanBrain({
-      claudeModel: null,
-      envKeys: {},
-      ollamaModels: [],
-    });
-    const localEvidence = result.evidence.find((e) => e.label === "Local Models");
-    expect(localEvidence?.status).toBe("found");
-    expect(localEvidence?.detail).toContain("installed");
+  it("gives baseline score for unknown model", () => {
+    const result = scanBrain({ claudeModel: "some-unknown-model-v99" });
+    expect(result.score).toBe(10);
+    expect(result.evidence[0].detail).toContain("unranked");
   });
 
   it("maxScore is always 25", () => {
-    const result = scanBrain({
-      claudeModel: null,
-      envKeys: {},
-      ollamaModels: null,
-    });
+    const result = scanBrain({ claudeModel: null });
     expect(result.maxScore).toBe(25);
   });
 });
