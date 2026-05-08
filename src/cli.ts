@@ -7,6 +7,7 @@ import { scanTuning } from "./scanner/tuning.js";
 import { scanEcosystem } from "./scanner/ecosystem.js";
 import { computeReport } from "./scorer/engine.js";
 import { renderFullReport } from "./render/terminal.js";
+import { generateCard } from "./render/card.js";
 import { MCP_CATEGORIES } from "./registry/mcp-registry.js";
 import { SKILL_CATEGORIES } from "./registry/skills-registry.js";
 import { getMcpCategory } from "./registry/mcp-registry.js";
@@ -90,6 +91,17 @@ export function run(): void {
         report.suggestions,
       );
       console.log(output);
+
+      if (opts.card !== false) {
+        try {
+          const cardPath = "./ai-score-card.png";
+          generateCard(report, cardPath);
+          console.log(chalk.cyan(`  📸 评分卡片已保存: ${cardPath}\n`));
+        } catch {
+          console.log(chalk.yellow(`  ⚠️  卡片生成失败（可能缺少 canvas 依赖）\n`));
+        }
+      }
+
       console.log();
     });
 
