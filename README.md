@@ -139,6 +139,22 @@ MCP 和 Skills 注册表内置在项目中。添加新条目：
 2. 在 `src/registry/mcp-registry.ts` 或 `src/registry/skills-registry.ts` 中添加 patterns
 3. 提交 PR
 
+## 未来展望
+
+**v0.2 — AI 装备商店**
+- `ai-score --fix` 一键安装缺失的 MCP 和 Skills，跑完分直接补短板
+- 自动推荐最适合你工作场景的 MCP 组合
+
+**v0.3 — 社区排行榜**
+- 匿名上报分数，真实的"击败了 XX% 的用户"
+- Web 排行榜 + 历史趋势图，看你的修仙进度
+- 团队对比模式，看看你的组谁最强
+
+**v1.0 — AI 工具链的 Awesome List**
+- 自动爬取全网 MCP 和 Skills，按质量/热度排名
+- `ai-score search <关键词>` 搜索最佳 MCP
+- 成为开发者发现和选择 AI 工具的第一入口
+
 ## 社区
 
 欢迎到 [linux.do](https://linux.do) 讨论你的跑分结果、分享提分攻略、或者提交 Bug 反馈。晒出你的分数，看看谁才是真正的 AI 军神！

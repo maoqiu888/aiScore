@@ -140,6 +140,22 @@ The MCP and Skills registries are built-in. To add new entries:
 2. Add patterns to `src/registry/mcp-registry.ts` or `src/registry/skills-registry.ts`
 3. Submit a PR
 
+## Roadmap
+
+**v0.2 — AI Equipment Shop**
+- `ai-score --fix` to auto-install missing MCP servers and Skills
+- Smart recommendations based on your workflow
+
+**v0.3 — Community Leaderboard**
+- Anonymous score reporting with real "Beat XX% of users" stats
+- Web leaderboard + historical trend charts
+- Team comparison mode
+
+**v1.0 — The Awesome List for AI Tools**
+- Auto-crawl MCP servers and Skills across npm/GitHub/PyPI
+- `ai-score search <keyword>` to find the best MCP for any use case
+- Become the go-to directory for AI tool discovery
+
 ## Community
 
 Share your score, discuss improvement tips, or report bugs on [linux.do](https://linux.do). Post your results and see who's the real AI God!
