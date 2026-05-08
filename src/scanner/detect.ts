@@ -17,9 +17,22 @@ export function parseOllamaList(output: string): string[] {
 export function extractMcpNames(config: unknown): string[] {
   if (!config || typeof config !== "object") return [];
   const obj = config as Record<string, unknown>;
+
+  // Format 1: { "mcpServers": { "name": { ... } } } — project/global config
   const servers = obj.mcpServers;
-  if (!servers || typeof servers !== "object") return [];
-  return Object.keys(servers as Record<string, unknown>);
+  if (servers && typeof servers === "object") {
+    return Object.keys(servers as Record<string, unknown>);
+  }
+
+  // Format 2: { "name": { "command": ... } } — plugin-level .mcp.json
+  // Keys are MCP names directly, values are objects with command/type
+  const names: string[] = [];
+  for (const [key, val] of Object.entries(obj)) {
+    if (val && typeof val === "object" && ("command" in val || "type" in val || "url" in val)) {
+      names.push(key);
+    }
+  }
+  return names;
 }
 
 export function extractSkillNames(dirs: string[]): string[] {
@@ -61,6 +74,24 @@ function detectClaudeModel(): string | null {
 }
 
 
+function scanDirForMcpJson(dir: string, results: Set<string>): void {
+  try {
+    if (!existsSync(dir)) return;
+    const entries = readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        scanDirForMcpJson(full, results);
+      } else if (entry.name === ".mcp.json" || entry.name === "mcp.json") {
+        const cfg = tryReadJson(full);
+        for (const name of extractMcpNames(cfg)) results.add(name);
+      }
+    }
+  } catch {
+    // skip unreadable directories
+  }
+}
+
 function extractMcpFromSettings(settingsObj: unknown): string[] {
   if (!settingsObj || typeof settingsObj !== "object") return [];
   const s = settingsObj as Record<string, unknown>;
@@ -87,6 +118,14 @@ function detectMcpNames(): string[] {
   for (const f of ["settings.json", "settings.local.json"]) {
     for (const name of extractMcpFromSettings(tryReadJson(join(home, ".claude", f)))) all.add(name);
   }
+
+  // Claude plugins — each plugin can have its own .mcp.json
+  const pluginsDir = join(home, ".claude", "plugins");
+  scanDirForMcpJson(pluginsDir, all);
+
+  // Codex plugins
+  const codexDir = join(home, ".codex", ".tmp", "plugins", "plugins");
+  scanDirForMcpJson(codexDir, all);
 
   // Claude Desktop config
   const desktopConfigPaths = platform() === "win32"
