@@ -1,0 +1,35 @@
+{
+  "name": "ai-score",
+  "version": "0.1.0",
+  "description": "AI toolchain benchmark — score your AI setup like 鲁大师 scores hardware",
+  "type": "module",
+  "bin": {
+    "ai-score": "./dist/bin/ai-score.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx bin/ai-score.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "ai",
+    "benchmark",
+    "cli",
+    "mcp",
+    "claude-code",
+    "score"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "boxen": "^8.0.1",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
+  }
+}
