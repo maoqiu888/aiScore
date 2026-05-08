@@ -1,20 +1,62 @@
-import { createCanvas } from "@napi-rs/canvas";
-import { writeFileSync } from "node:fs";
+import { createCanvas, GlobalFonts } from "@napi-rs/canvas";
+import { writeFileSync, existsSync } from "node:fs";
+import { join } from "node:path";
+import { homedir, platform } from "node:os";
 import type { ScoreReport } from "../types.js";
 
 const WIDTH = 800;
-const HEIGHT = 600;
+const HEIGHT = 520;
 const BG = "#0f172a";
 const TEXT = "#e2e8f0";
 const ACCENT = "#38bdf8";
 const GREEN = "#4ade80";
 const GRAY = "#475569";
 const BAR_BG = "#1e293b";
+const YELLOW = "#facc15";
 
-const DIMENSION_LABELS: Record<string, { icon: string; label: string }> = {
-  brain: { icon: "🧠", label: "Brain" },
-  power: { icon: "⚡", label: "Power" },
-  config: { icon: "🎯", label: "Config" },
+const GRADE_COLORS: Record<string, string> = {
+  SSS: "#ff6b6b",
+  S: "#ffd43b",
+  A: "#69db7c",
+  B: "#74c0fc",
+  C: "#b197fc",
+  D: "#868e96",
+};
+
+const DIMENSION_META: Record<string, { marker: string; label: string; color: string }> = {
+  brain: { marker: "[B]", label: "Brain", color: "#a78bfa" },
+  power: { marker: "[P]", label: "Power", color: "#34d399" },
+  config: { marker: "[C]", label: "Config", color: "#fbbf24" },
+};
+
+function tryLoadCjkFont(): boolean {
+  const candidates = platform() === "win32"
+    ? [
+        "C:\\Windows\\Fonts\\msyh.ttc",
+        "C:\\Windows\\Fonts\\simhei.ttf",
+        "C:\\Windows\\Fonts\\simsun.ttc",
+      ]
+    : [
+        "/System/Library/Fonts/PingFang.ttc",
+        "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+      ];
+  for (const path of candidates) {
+    if (existsSync(path)) {
+      GlobalFonts.registerFromPath(path, "CJK");
+      return true;
+    }
+  }
+  return false;
+}
+
+const GRADE_TITLES_EN: Record<string, string> = {
+  "天道演算使": "Dao Calculator",
+  "万法归一": "All Laws as One",
+  "御灵尊者": "Spirit Commander",
+  "阵法小成": "Formation Adept",
+  "初窥门径": "Glimpsed the Path",
+  "凡骨未褪": "Mortal Bones",
 };
 
 function drawRoundedRect(
@@ -35,6 +77,9 @@ function drawRoundedRect(
 }
 
 export function generateCard(report: ScoreReport, outputPath: string): void {
+  const hasCjk = tryLoadCjkFont();
+  const fontFamily = hasCjk ? "'CJK', sans-serif" : "sans-serif";
+
   const canvas = createCanvas(WIDTH, HEIGHT);
   const ctx = canvas.getContext("2d");
 
@@ -44,64 +89,85 @@ export function generateCard(report: ScoreReport, outputPath: string): void {
 
   // Title
   ctx.fillStyle = ACCENT;
-  ctx.font = "bold 20px sans-serif";
+  ctx.font = `bold 22px ${fontFamily}`;
   ctx.textAlign = "center";
-  ctx.fillText("⚡ AI SCORE", WIDTH / 2, 50);
+  ctx.fillText("AI SCORE", WIDTH / 2, 50);
 
   // Big score
   ctx.fillStyle = TEXT;
-  ctx.font = "bold 72px sans-serif";
-  ctx.fillText(`${report.total}`, WIDTH / 2, 140);
+  ctx.font = `bold 80px ${fontFamily}`;
+  ctx.fillText(`${report.total}`, WIDTH / 2 - 30, 145);
 
-  ctx.font = "24px sans-serif";
+  ctx.font = `28px ${fontFamily}`;
   ctx.fillStyle = GRAY;
-  ctx.fillText("/ 100", WIDTH / 2 + 60, 140);
+  ctx.fillText("/ 100", WIDTH / 2 + 55, 145);
 
-  // Grade
-  ctx.fillStyle = ACCENT;
-  ctx.font = "bold 28px sans-serif";
-  ctx.fillText(`${report.gradeInfo.grade} — ${report.gradeInfo.title}`, WIDTH / 2, 185);
+  // Grade badge
+  const gradeColor = GRADE_COLORS[report.gradeInfo.grade] ?? ACCENT;
+  ctx.fillStyle = gradeColor;
+  ctx.font = `bold 32px ${fontFamily}`;
+  const title = hasCjk ? report.gradeInfo.title : (GRADE_TITLES_EN[report.gradeInfo.title] ?? report.gradeInfo.title);
+  ctx.fillText(`${report.gradeInfo.grade}  ${title}`, WIDTH / 2, 195);
+
+  // Separator line
+  ctx.strokeStyle = "#1e293b";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(100, 220);
+  ctx.lineTo(700, 220);
+  ctx.stroke();
 
   // Dimension bars
   const barX = 100;
-  const barWidth = 400;
-  const barHeight = 24;
-  let barY = 230;
+  const barWidth = 420;
+  const barHeight = 28;
+  let barY = 245;
 
   for (const dim of report.dimensions) {
-    const meta = DIMENSION_LABELS[dim.name] ?? { icon: "?", label: dim.name };
+    const meta = DIMENSION_META[dim.name] ?? { marker: "?", label: dim.name, color: GREEN };
 
-    ctx.fillStyle = TEXT;
-    ctx.font = "16px sans-serif";
+    // Label
+    ctx.fillStyle = meta.color;
+    ctx.font = `bold 18px ${fontFamily}`;
     ctx.textAlign = "left";
-    ctx.fillText(`${meta.icon} ${meta.label}`, barX, barY + 17);
+    ctx.fillText(meta.label, barX, barY + 20);
 
     // Bar background
-    const bx = barX + 140;
+    const bx = barX + 100;
     ctx.fillStyle = BAR_BG;
-    drawRoundedRect(ctx, bx, barY, barWidth, barHeight, 4);
+    drawRoundedRect(ctx, bx, barY, barWidth, barHeight, 6);
     ctx.fill();
 
     // Bar fill
-    const fillWidth = Math.round((dim.score / dim.maxScore) * barWidth);
-    ctx.fillStyle = GREEN;
-    drawRoundedRect(ctx, bx, barY, fillWidth, barHeight, 4);
+    const fillWidth = Math.max(4, Math.round((dim.score / dim.maxScore) * barWidth));
+    ctx.fillStyle = meta.color;
+    drawRoundedRect(ctx, bx, barY, fillWidth, barHeight, 6);
     ctx.fill();
 
     // Score text
     ctx.fillStyle = TEXT;
-    ctx.font = "14px sans-serif";
+    ctx.font = `bold 16px ${fontFamily}`;
     ctx.textAlign = "left";
-    ctx.fillText(`${dim.score}/${dim.maxScore}`, bx + barWidth + 16, barY + 17);
+    ctx.fillText(`${dim.score}/${dim.maxScore}`, bx + barWidth + 16, barY + 20);
 
-    barY += 50;
+    barY += 55;
+  }
+
+  // Suggestions hint
+  if (report.suggestions.length > 0) {
+    barY += 10;
+    ctx.fillStyle = YELLOW;
+    ctx.font = `14px ${fontFamily}`;
+    ctx.textAlign = "center";
+    const topSuggestion = report.suggestions[0];
+    ctx.fillText(`+${topSuggestion.points} pts available — run ai-score for details`, WIDTH / 2, barY);
   }
 
   // Footer
   ctx.fillStyle = GRAY;
-  ctx.font = "14px sans-serif";
+  ctx.font = `13px ${fontFamily}`;
   ctx.textAlign = "center";
-  ctx.fillText("Generated by ai-score", WIDTH / 2, HEIGHT - 30);
+  ctx.fillText("github.com/maoqiu888/aiScore", WIDTH / 2, HEIGHT - 25);
 
   const buffer = canvas.toBuffer("image/png");
   writeFileSync(outputPath, buffer);
