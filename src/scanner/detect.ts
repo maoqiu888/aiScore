@@ -80,26 +80,39 @@ function detectOllamaModels(): string[] | null {
   return parseOllamaList(output);
 }
 
+function extractMcpFromSettings(settingsObj: unknown): string[] {
+  if (!settingsObj || typeof settingsObj !== "object") return [];
+  const s = settingsObj as Record<string, unknown>;
+  if (s.mcpServers && typeof s.mcpServers === "object") {
+    return Object.keys(s.mcpServers as Record<string, unknown>);
+  }
+  return [];
+}
+
 function detectMcpNames(): string[] {
   const all = new Set<string>();
+  const home = homedir();
+
+  // Project-level .mcp.json
   const projectMcp = tryReadJson(".mcp.json");
   for (const name of extractMcpNames(projectMcp)) all.add(name);
 
-  const home = homedir();
-  const globalMcp = tryReadJson(join(home, ".claude", "settings.json"));
-  if (globalMcp && typeof globalMcp === "object") {
-    const g = globalMcp as Record<string, unknown>;
-    if (g.mcpServers && typeof g.mcpServers === "object") {
-      for (const name of Object.keys(g.mcpServers as Record<string, unknown>)) all.add(name);
-    }
+  // Project-level .claude/settings.json and settings.local.json
+  for (const f of [".claude/settings.json", ".claude/settings.local.json"]) {
+    for (const name of extractMcpFromSettings(tryReadJson(f))) all.add(name);
   }
 
+  // Global ~/.claude/settings.json and settings.local.json
+  for (const f of ["settings.json", "settings.local.json"]) {
+    for (const name of extractMcpFromSettings(tryReadJson(join(home, ".claude", f)))) all.add(name);
+  }
+
+  // Claude Desktop config
   const desktopConfigPaths = platform() === "win32"
     ? [join(home, "AppData", "Roaming", "Claude", "claude_desktop_config.json")]
     : [join(home, "Library", "Application Support", "Claude", "claude_desktop_config.json")];
   for (const p of desktopConfigPaths) {
-    const cfg = tryReadJson(p);
-    for (const name of extractMcpNames(cfg)) all.add(name);
+    for (const name of extractMcpNames(tryReadJson(p))) all.add(name);
   }
 
   return [...all];
@@ -107,19 +120,39 @@ function detectMcpNames(): string[] {
 
 function detectSkillNames(): string[] {
   const home = homedir();
+  const names = new Set<string>();
+
+  // Primary source: enabledPlugins in settings.json (most reliable)
+  const settings = tryReadJson(join(home, ".claude", "settings.json")) as Record<string, unknown> | null;
+  if (settings?.enabledPlugins && typeof settings.enabledPlugins === "object") {
+    for (const key of Object.keys(settings.enabledPlugins as Record<string, unknown>)) {
+      // Format: "superpowers@claude-plugins-official" → extract "superpowers"
+      const pluginName = key.split("@")[0];
+      if (pluginName) names.add(pluginName);
+    }
+  }
+
+  // Fallback: scan plugin cache directory structure (marketplace/plugin-name/hash/)
   const pluginCachePath = join(home, ".claude", "plugins", "cache");
   try {
-    if (!existsSync(pluginCachePath)) return [];
-    const entries = readdirSync(pluginCachePath);
-    const names: string[] = [];
-    for (const entry of entries) {
-      const full = join(pluginCachePath, entry);
-      if (statSync(full).isDirectory()) names.push(entry);
+    if (existsSync(pluginCachePath)) {
+      const marketplaces = readdirSync(pluginCachePath);
+      for (const marketplace of marketplaces) {
+        const mpPath = join(pluginCachePath, marketplace);
+        if (!statSync(mpPath).isDirectory()) continue;
+        const plugins = readdirSync(mpPath);
+        for (const plugin of plugins) {
+          if (statSync(join(mpPath, plugin)).isDirectory()) {
+            names.add(plugin);
+          }
+        }
+      }
     }
-    return names;
   } catch {
-    return [];
+    // ignore
   }
+
+  return [...names];
 }
 
 function detectInstructionFiles(): InstructionFile[] {
