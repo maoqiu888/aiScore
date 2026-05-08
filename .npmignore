@@ -1,0 +1,7 @@
+tests/
+docs/
+*.test.ts
+vitest.config.ts
+tsconfig.json
+.mcp.json
+.claude/

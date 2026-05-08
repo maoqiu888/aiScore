@@ -21,7 +21,16 @@
     "score"
   ],
   "license": "MIT",
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
+    "@napi-rs/canvas": "^1.0.0",
     "boxen": "^8.0.1",
     "chalk": "^5.4.1",
     "commander": "^13.1.0"
