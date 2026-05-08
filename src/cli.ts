@@ -87,9 +87,15 @@ export function run(): void {
 
       if (opts.card !== false) {
         try {
-          const cardPath = "./ai-score-card.png";
+          const { resolve } = await import("node:path");
+          const { exec } = await import("node:child_process");
+          const { platform } = await import("node:os");
+          const cardPath = resolve("ai-score-card.png");
           generateCard(report, cardPath);
           console.log(chalk.cyan(`  📸 评分卡片已保存: ${cardPath}\n`));
+          const os = platform();
+          const openCmd = os === "win32" ? `start "" "${cardPath}"` : os === "darwin" ? `open "${cardPath}"` : `xdg-open "${cardPath}"`;
+          exec(openCmd);
         } catch {
           console.log(chalk.yellow(`  ⚠️  卡片生成失败（可能缺少 canvas 依赖）\n`));
         }
