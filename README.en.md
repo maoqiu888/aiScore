@@ -63,14 +63,14 @@ Detects how well you've configured your AI tools:
 
 ## Grade system
 
-| Score | Grade | Title |
-|-------|-------|-------|
-| 90-100 | SSS | AI God |
-| 80-89 | S | AI Fully Armed |
-| 70-79 | A | AI Pro |
-| 60-69 | B | AI Skilled |
-| 40-59 | C | AI Beginner |
-| 0-39 | D | AI Naked |
+| Score | Grade | Title | Meaning |
+|-------|-------|-------|---------|
+| 90-100 | SSS | Dao Calculator | Perceives the laws governing all things, conjures formations with a thought |
+| 80-89 | S | All Laws as One | Mastered every toolset and agent, unified in understanding |
+| 70-79 | A | Spirit Commander | Freely wields all manner of LLMs to serve your will |
+| 60-69 | B | Formation Adept | Grasped the basics of prompt engineering and workflows |
+| 40-59 | C | Glimpsed the Path | Just starting with AI, channeling qi into the body |
+| 0-39 | D | Mortal Bones | Pure physical labor, unaugmented by AI |
 
 ## What it detects
 

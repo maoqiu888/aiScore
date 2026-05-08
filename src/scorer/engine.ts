@@ -8,12 +8,12 @@ import type {
 } from "../types.js";
 
 const GRADE_TABLE: { min: number; grade: Grade; title: string }[] = [
-  { min: 90, grade: "SSS", title: "AI 军神" },
-  { min: 80, grade: "S", title: "AI 武装到牙齿" },
-  { min: 70, grade: "A", title: "AI 高玩" },
-  { min: 60, grade: "B", title: "AI 熟练工" },
-  { min: 40, grade: "C", title: "AI 入门选手" },
-  { min: 0, grade: "D", title: "AI 裸奔中" },
+  { min: 90, grade: "SSS", title: "天道演算使" },
+  { min: 80, grade: "S", title: "万法归一" },
+  { min: 70, grade: "A", title: "御灵尊者" },
+  { min: 60, grade: "B", title: "阵法小成" },
+  { min: 40, grade: "C", title: "初窥门径" },
+  { min: 0, grade: "D", title: "凡骨未褪" },
 ];
 
 export function getGradeInfo(total: number): GradeInfo {
@@ -22,7 +22,7 @@ export function getGradeInfo(total: number): GradeInfo {
       return { grade: entry.grade, title: entry.title };
     }
   }
-  return { grade: "D", title: "AI 裸奔中" };
+  return { grade: "D", title: "凡骨未褪" };
 }
 
 function buildSuggestions(categories: CategoryCoverage[]): Suggestion[] {
