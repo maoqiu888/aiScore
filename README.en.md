@@ -7,21 +7,14 @@
 Like [PC benchmarks](https://en.wikipedia.org/wiki/Benchmark_(computing)) for your hardware — but for your AI coding tools.
 
 ```bash
-# After npm publish (coming soon)
 npx ai-score
-
-# Run from source
-git clone https://github.com/maoqiu888/aiScore.git
-cd aiScore
-npm install
-npx tsx bin/ai-score.ts
 ```
 
 ```
 ╔═══════════════════════════╗
 ║                           ║
 ║   ⚡ AI SCORE: 76 / 100   ║
-║     Grade: A — AI Pro     ║
+║  Grade: A — Spirit Commander  ║
 ║                           ║
 ╚═══════════════════════════╝
 

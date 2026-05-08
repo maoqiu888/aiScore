@@ -7,21 +7,14 @@
 就像鲁大师给硬件跑分一样 —— 但这次跑的是你的 AI。
 
 ```bash
-# npm 发布后（即将支持）
 npx ai-score
-
-# 从源码运行
-git clone https://github.com/maoqiu888/aiScore.git
-cd aiScore
-npm install
-npx tsx bin/ai-score.ts
 ```
 
 ```
 ╔═══════════════════════════╗
 ║                           ║
 ║   ⚡ AI SCORE: 76 / 100   ║
-║     等级: A — AI 高玩     ║
+║    等级: A — 御灵尊者     ║
 ║                           ║
 ╚═══════════════════════════╝
 
