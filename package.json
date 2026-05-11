@@ -1,6 +1,6 @@
 {
   "name": "ai-score",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "AI toolchain benchmark — score your AI setup like 鲁大师 scores hardware",
   "type": "module",
   "bin": {

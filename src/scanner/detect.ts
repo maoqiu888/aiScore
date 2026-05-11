@@ -59,14 +59,37 @@ function commandExists(name: string): boolean {
   return tryExec(cmd) !== null;
 }
 
-function detectClaudeModel(): string | null {
+function detectModel(): string | null {
   const home = homedir();
-  const settingsPath = join(home, ".claude", "settings.json");
-  const settings = tryReadJson(settingsPath) as Record<string, unknown> | null;
-  if (settings?.model && typeof settings.model === "string") return settings.model;
 
-  const projectSettings = tryReadJson(".claude/settings.json") as Record<string, unknown> | null;
-  if (projectSettings?.model && typeof projectSettings.model === "string") return projectSettings.model;
+  // Claude Code settings
+  for (const p of [join(home, ".claude", "settings.json"), ".claude/settings.json"]) {
+    const s = tryReadJson(p) as Record<string, unknown> | null;
+    if (s?.model && typeof s.model === "string") return s.model;
+  }
+
+  // VS Code / Codex settings — look for model in common extension configs
+  const vscodeSettings = tryReadJson(join(home, ".vscode", "settings.json")) as Record<string, unknown> | null;
+  if (vscodeSettings) {
+    // GitHub Copilot model
+    const copilotModel = vscodeSettings["github.copilot.chat.model"] ?? vscodeSettings["github.copilot.selectedModel"];
+    if (copilotModel && typeof copilotModel === "string") return copilotModel;
+    // Continue extension model
+    const continueModel = vscodeSettings["continue.model"];
+    if (continueModel && typeof continueModel === "string") return continueModel;
+  }
+
+  // Cursor settings
+  const cursorSettings = tryReadJson(join(home, ".cursor", "settings.json")) as Record<string, unknown> | null;
+  if (cursorSettings?.model && typeof cursorSettings.model === "string") return cursorSettings.model;
+
+  // Codex config
+  const codexConfig = tryReadJson(join(home, ".codex", "config.json")) as Record<string, unknown> | null;
+  if (codexConfig?.model && typeof codexConfig.model === "string") return codexConfig.model;
+
+  // Environment variable hints
+  if (process.env.OPENAI_MODEL) return process.env.OPENAI_MODEL;
+  if (process.env.ANTHROPIC_MODEL) return process.env.ANTHROPIC_MODEL;
 
   return null;
 }
@@ -270,7 +293,7 @@ export function detectAll(): FullDetection {
   const { hasHooks, settingsCustomized } = detectHooksAndSettings();
   return {
     brain: {
-      claudeModel: detectClaudeModel(),
+      modelId: detectModel(),
     },
     power: {
       mcpNames: detectMcpNames(),

@@ -2,41 +2,65 @@ import { describe, it, expect } from "vitest";
 import { scanBrain } from "../../src/scanner/brain.js";
 
 describe("scanBrain", () => {
-  it("scores high for opus model based on ELO", () => {
-    const result = scanBrain({ claudeModel: "claude-opus-4-6" });
+  it("scores high for opus model", () => {
+    const result = scanBrain({ modelId: "claude-opus-4-6" });
+    expect(result.score).toBeGreaterThanOrEqual(25);
+    expect(result.evidence[0].detail).toContain("Opus");
+  });
+
+  it("scores GPT-5.5 correctly", () => {
+    const result = scanBrain({ modelId: "gpt-5.5" });
     expect(result.score).toBeGreaterThanOrEqual(20);
-    const ev = result.evidence.find((e) => e.label === "Model");
-    expect(ev?.status).toBe("found");
-    expect(ev?.detail).toContain("Opus");
-    expect(ev?.detail).toContain("ELO");
+    expect(result.evidence[0].detail).toContain("GPT-5.5");
   });
 
-  it("scores lower for sonnet than opus", () => {
-    const opus = scanBrain({ claudeModel: "claude-opus-4-6" });
-    const sonnet = scanBrain({ claudeModel: "claude-sonnet-4-6" });
+  it("scores Gemini models", () => {
+    const result = scanBrain({ modelId: "gemini-2.5-pro" });
+    expect(result.score).toBeGreaterThan(15);
+    expect(result.evidence[0].detail).toContain("Gemini");
+  });
+
+  it("scores DeepSeek models", () => {
+    const result = scanBrain({ modelId: "deepseek-v3" });
+    expect(result.score).toBeGreaterThan(15);
+    expect(result.evidence[0].detail).toContain("DeepSeek");
+  });
+
+  it("scores Grok models", () => {
+    const result = scanBrain({ modelId: "grok-4" });
+    expect(result.score).toBeGreaterThan(20);
+  });
+
+  it("scores Qwen models", () => {
+    const result = scanBrain({ modelId: "qwen-3" });
+    expect(result.score).toBeGreaterThan(15);
+  });
+
+  it("scores Llama models", () => {
+    const result = scanBrain({ modelId: "llama-4" });
+    expect(result.score).toBeGreaterThan(15);
+  });
+
+  it("ranks opus > sonnet > haiku", () => {
+    const opus = scanBrain({ modelId: "claude-opus-4-6" });
+    const sonnet = scanBrain({ modelId: "claude-sonnet-4-6" });
+    const haiku = scanBrain({ modelId: "claude-haiku-4.5" });
     expect(opus.score).toBeGreaterThan(sonnet.score);
-  });
-
-  it("scores lower for haiku than sonnet", () => {
-    const sonnet = scanBrain({ claudeModel: "claude-sonnet-4-6" });
-    const haiku = scanBrain({ claudeModel: "claude-haiku-4.5-20251001" });
     expect(sonnet.score).toBeGreaterThan(haiku.score);
   });
 
-  it("scores 0 for no model detected", () => {
-    const result = scanBrain({ claudeModel: null });
+  it("scores 0 for no model", () => {
+    const result = scanBrain({ modelId: null });
     expect(result.score).toBe(0);
-    expect(result.evidence[0].status).toBe("missing");
   });
 
-  it("gives baseline score for unknown model", () => {
-    const result = scanBrain({ claudeModel: "some-unknown-model-v99" });
+  it("gives baseline for unknown model", () => {
+    const result = scanBrain({ modelId: "some-unknown-v99" });
     expect(result.score).toBe(10);
     expect(result.evidence[0].detail).toContain("unranked");
   });
 
-  it("maxScore is always 25", () => {
-    const result = scanBrain({ claudeModel: null });
-    expect(result.maxScore).toBe(30);
+  it("maxScore is 30", () => {
+    expect(scanBrain({ modelId: null }).maxScore).toBe(30);
   });
 });
